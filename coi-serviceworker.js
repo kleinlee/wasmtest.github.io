@@ -72,7 +72,6 @@ if (typeof window === 'undefined') {
             coepDegrade: () => true,
             doReload: () => window.location.reload(true),
             quiet: false,
-            ...window.coi
         };
 
         const n = navigator;
