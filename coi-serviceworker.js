@@ -70,7 +70,7 @@ if (typeof window === 'undefined') {
             shouldDeregister: () => false,
             coepCredentialless: () => true,
             coepDegrade: () => true,
-            doReload: () => window.location.reload(),
+            doReload: () => window.location.reload(true),
             quiet: false,
             ...window.coi
         };
