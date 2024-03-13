@@ -1,5 +1,6 @@
 // 检查浏览器是否支持SharedArrayBuffer
 if (typeof SharedArrayBuffer === 'undefined') {
+  console.log("SharedArrayBuffer undefined");
   // 创建一个替代的共享内存数组
   class SharedArrayBufferReplacement {
     constructor(length) {
