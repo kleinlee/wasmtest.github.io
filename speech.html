@@ -121,6 +121,10 @@
         output.value += '\nRecognition stopped';
         startButton.innerHTML = 'START';
         listening = false;
+
+        recognition.start();
+          startButton.innerHTML = 'STOP';
+          listening = true;
       };
 
       recognition.onresult = event => {
