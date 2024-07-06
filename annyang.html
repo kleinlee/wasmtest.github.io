@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>ASR with Annyang</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <style>
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<button id="start">开始识别</button>
+<button id="stop">停止识别</button>
+<div id="transcript"></div>
+<script>
+    // Check if Annyang is available
+    if (annyang) {
+        var commands = {
+            '*command': function(command) {
+                console.log('你说的是：', command);
+                document.getElementById('transcript').innerText = command;
+            }
+        };
+
+        // Add event listeners for the buttons
+        document.getElementById('start').addEventListener('click', function() {
+            if (!annyang.isListening()) {
+                annyang.start({language: 'zh-CN'});
+            }
+        });
+
+        document.getElementById('stop').addEventListener('click', function() {
+            if (annyang.isListening()) {
+                annyang.abort();
+            }
+        });
+        annyang.setLanguage('zh-CN');
+        // Add our commands to annyang
+        annyang.addCommands(commands);
+
+        // Start listening.
+        annyang.start({autoRestart: false, continuous: true});
+    } else {
+        console.log('Annyang is not supported in this browser.');
+    }
+</script>
+
+</body>
+</html>
