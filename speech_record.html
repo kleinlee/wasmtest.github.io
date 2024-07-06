@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>录音和播放示例</title>
+</head>
+<body>
+
+<button id="startButton">开始录音</button>
+<button id="stopButton">结束录音并播放</button>
+
+<script>
+// 获取按钮元素
+var startButton = document.getElementById('startButton');
+var stopButton = document.getElementById('stopButton');
+var audioContext = null;
+var recorder = null;
+var audioChunks = [];
+
+startButton.addEventListener('click', function() {
+    // 检查浏览器是否支持Web Audio API
+    if (!navigator.mediaDevices) {
+        alert('您的浏览器不支持录音功能。');
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            // 创建MediaRecorder实例
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            recorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            // 当数据可用时，将其添加到chunks数组
+            recorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            // 开始录制
+            recorder.start();
+
+            // 监听停止按钮点击事件
+            stopButton.disabled = false;
+        })
+        .catch(error => {
+            console.error('录音失败:', error);
+        });
+});
+
+stopButton.addEventListener('click', function() {
+    if (recorder) {
+        // 停止录制
+        recorder.stop();
+
+        // 处理录制的数据
+        recorder.onstop = async () => {
+            // 将chunks转换为音频文件
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            // 创建一个新的Audio对象并播放
+            const audio = new Audio(audioUrl);
+            audio.play();
+
+            // 清理资源
+            audioChunks = [];
+            audioContext.close();
+            audioContext = null;
+            recorder = null;
+            stopButton.disabled = true;
+        };
+    }
+});
+
+// 禁用结束按钮，直到开始录制
+stopButton.disabled = true;
+</script>
+
+</body>
+</html>
