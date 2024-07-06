@@ -4,9 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>中文语音识别示例</title>
+    <style>
+        #indicator {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        #indicator.green {
+            background-color: green;
+        }
+        #indicator.red {
+            background-color: red;
+        }
+        #transcript {
+            font-size: 24px;
+            margin-top: 30px;
+            color: blue;
+        }
+        .interim {
+            color: gray;
+        }
+    </style>
 </head>
 <body>
     <h1>中文语音识别</h1>
+    <div id="indicator"></div>
     <button id="startButton">开始识别</button>
     <button id="stopButton">停止识别</button>
     <div id="transcript"></div>
@@ -19,13 +43,23 @@
 
         let started = false;
         let transcriptDiv = document.getElementById('transcript');
+        let indicator = document.getElementById('indicator');
         let startButton = document.getElementById('startButton');
         let stopButton = document.getElementById('stopButton');
+
+        function updateIndicatorColor() {
+            if (started) {
+                indicator.className = 'green';
+            } else {
+                indicator.className = 'red';
+            }
+        }
 
         startButton.addEventListener('click', () => {
             if (!started) {
                 recognition.start();
                 started = true;
+                updateIndicatorColor();
             }
         });
 
@@ -33,9 +67,13 @@
             if (started) {
                 recognition.stop();
                 started = false;
+                updateIndicatorColor();
             }
         });
-
+        recognition.onend = event => {
+            started = false;
+            updateIndicatorColor();
+        };
         recognition.onresult = function(event) {
             let interimTranscript = '';
             let finalTranscript = '';
@@ -52,17 +90,9 @@
             // 清除之前的临时文本
             transcriptDiv.innerHTML = finalTranscript + '<span class="interim">' + interimTranscript + '</span>';
         };
-    </script>
 
-    <style>
-        #transcript {
-            font-size: 24px;
-            margin-top: 30px;
-            color: blue;
-        }
-        .interim {
-            color: gray;
-        }
-    </style>
+        // 初始化指示灯颜色
+        updateIndicatorColor();
+    </script>
 </body>
 </html>
