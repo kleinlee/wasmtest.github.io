@@ -41,8 +41,12 @@
         var recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (recognition) {
+          console.log('Web Speech API is supported in this browser.');
+          document.getElementById('transcript').innerHTML = "<b>Browser does support Speech API. Please download latest chrome.<b>";
           recognition = new recognition();
         } else {
+          console.log('Web Speech API is not supported in this browser.');
+          document.getElementById('transcript').innerHTML = "<b>Browser does not support Speech API. Please download latest chrome.<b>";
           alert("Sorry, your browser doesn't support speech recognition.");
         }
 
