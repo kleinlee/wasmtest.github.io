@@ -86,8 +86,9 @@
             }
         });
         recognition.onerror = event => {
-                console.error('Error occurred in recognition:', event.error);
-            };
+          console.log(`Speech recognition error detected: ${event.error}`);
+          console.log(`Additional information: ${event.message}`);
+        };
         recognition.onend = event => {
             started = false;
             updateIndicatorColor();
