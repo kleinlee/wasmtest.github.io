@@ -1,0 +1,50 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ASR Demo</title>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var asr = null;
+            var recognition = null;
+
+            async function initAsr() {
+                try {
+                    asr = await window.asr.createASR({
+                        language: 'zh-CN',
+                        continuous: true,
+                        interimResults: true,
+                        maxAlternatives: 1
+                    });
+                    recognition = new window.asr.Recognition(asr);
+                    recognition.onresult = function(event) {
+                        console.log('ASR result:', event.results);
+                    };
+                    recognition.onerror = function(event) {
+                        console.error('ASR error:', event.error);
+                    };
+                } catch (error) {
+                    console.error('Failed to initialize ASR:', error);
+                }
+            }
+
+            function startRecognition() {
+                if (recognition && !recognition.isRecognizing()) {
+                    recognition.start();
+                }
+            }
+
+            function stopRecognition() {
+                if (recognition && recognition.isRecognizing()) {
+                    recognition.stop();
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <button onclick="initAsr()">初始化ASR</button>
+    <button onclick="startRecognition()">开始识别</button>
+    <button onclick="stopRecognition()">停止识别</button>
+</body>
+</html>
