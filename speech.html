@@ -36,7 +36,18 @@
     <div id="transcript"></div>
 
     <script>
-        const recognition = new webkitSpeechRecognition();
+        // const recognition = new webkitSpeechRecognition();
+        // 创建 SpeechRecognition 对象实例
+        var recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (recognition) {
+          recognition = new recognition();
+        } else {
+          alert("Sorry, your browser doesn't support speech recognition.");
+        }
+
+
+
         recognition.lang = 'zh-CN';
         recognition.interimResults = true;
         recognition.continuous = true;
@@ -71,8 +82,8 @@
             }
         });
         recognition.onerror = event => {
-            console.error('Error occurred in recognition:', event.error);
-        };
+                console.error('Error occurred in recognition:', event.error);
+            };
         recognition.onend = event => {
             started = false;
             updateIndicatorColor();
