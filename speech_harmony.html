@@ -1,54 +1,143 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html>
-<head>
-    <title>ASR Demo</title>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            var asr = null;
-            var recognition = null;
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Web Speech API Test </title>
+    <style>
+      * { box-sizing: border-box; }
 
-            async function initAsr() {
-                try {
-                    asr = await window.asr.createASR({
-                        language: 'zh-CN',
-                        continuous: true,
-                        interimResults: true,
-                        maxAlternatives: 1
-                    });
-                    recognition = new window.asr.Recognition(asr);
-                    recognition.onresult = function(event) {
-                        document.getElementById('transcript').innerHTML = event.results;
-                        console.log('ASR result:', event.results);
-                    };
-                    recognition.onerror = function(event) {
-                        document.getElementById('transcript').innerHTML = "<b>ASR error<b>";
-                        console.error('ASR error:', event.error);
-                    };
-                } catch (error) {
-                    document.getElementById('transcript').innerHTML = "<b>Failed to initialize ASR<b>";
-                    console.error('Failed to initialize ASR:', error);
-                }
-            }
+      html {
+        height: 100%;
+        width: 100%;
+      }
 
-            function startRecognition() {
-                if (recognition && !recognition.isRecognizing()) {
-                    recognition.start();
-                }
-            }
+      body {
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 10fr 1fr;
+        font-family: sans-serif;
+      }
 
-            function stopRecognition() {
-                if (recognition && recognition.isRecognizing()) {
-                    recognition.stop();
-                }
-            }
-        });
+      h1 {
+        margin: 0;
+        padding: 0.5rem;
+        background-color: dodgerblue;
+        text-align: center;
+      }
+
+      #output {
+        margin: 0;
+        padding: 0.5em;
+        border: 0;
+        background-color: transparent;
+      }
+
+      #start {
+        display: block;
+        background-color: dodgerblue;
+        border: 0;
+        color: navy;
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1> Web Speech API Test </h1>
+    <textarea id="output"></textarea>
+    <button id="start"> START </button>
+    <script>
+      let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+      let SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+      let grammar = '#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige | bisque | black | blue | brown | chocolate | coral | crimson | cyan | fuchsia | ghostwhite | gold | goldenrod | gray | green | indigo | ivory | khaki | lavender | lime | linen | magenta | maroon | moccasin | navy | olive | orange | orchid | peru | pink | plum | purple | red | salmon | sienna | silver | snow | tan | teal | thistle | tomato | turquoise | violet | white | yellow ;';
+
+      let recognition = new SpeechRecognition();
+      let speechRecognitionList = new SpeechGrammarList();
+      speechRecognitionList.addFromString(grammar, 1);
+
+      recognition.grammars = speechRecognitionList;
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      let startButton = document.getElementById('start');
+      let output = document.getElementById('output');
+      output.value += 'Initializing...';
+
+      let listening = false;
+
+      startButton.addEventListener('click', event => {
+        if (listening == false) {
+          recognition.start();
+          startButton.innerHTML = 'STOP';
+          listening = true;
+        } else {
+      //    recognition.stop();
+          recognition.abort();
+        }
+      });
+
+      console.dir(recognition);
+      output.value += 'ready.';
+
+      recognition.onstart = event => {
+        output.value += '\nRecognition started';
+      };
+
+      recognition.onaudiostart = event => {
+        output.value += '\nAudio started';
+      };
+
+      recognition.onsoundstart = event => {
+        output.value += '\nSound started';
+      };
+
+      recognition.onspeechstart = event => {
+        output.value += '\nSpeech started';
+      };
+
+      recognition.onspeechend = event => {
+        output.value += '\nSpeech ended';
+        recognition.stop();
+      };
+
+      recognition.onsoundend = event => {
+        output.value += '\nSound ended';
+      };
+
+      recognition.onaudioend = event => {
+        output.value += '\nAudio ended';
+      };
+
+      recognition.onend = event => {
+        output.value += '\nRecognition stopped';
+        startButton.innerHTML = 'START';
+        listening = false;
+      };
+
+      recognition.onresult = event => {
+        let color = event.results[0][0].transcript;
+        let confidence = event.results[0][0].confidence;
+        document.body.style.backgroundColor = color;
+        output.value += '\nResult recieved: ' + color;
+        output.value += '\nConfidence: ' + confidence;
+      };
+
+      recognition.onnomatch = event => {
+        output.value += '\nColor not recognised';
+      };
+
+      recognition.onerror = event => {
+        output.value += '\nERROR: ' + event.error;
+      };
     </script>
-</head>
-<body>
-    <button onclick="initAsr()">初始化ASR</button>
-    <button onclick="startRecognition()">开始识别</button>
-    <button onclick="stopRecognition()">停止识别</button>
-    <div id="transcript"></div>
-</body>
+  </body>
 </html>
