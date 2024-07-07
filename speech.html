@@ -36,6 +36,36 @@
     <div id="transcript"></div>
 
     <script>
+      async function checkMicrophonePermission() {
+        try {
+          const permission = await navigator.permissions.query({ name: "microphone" });
+          switch(permission.state) {
+            case 'granted':
+                console.log("Microphone access is granted.");
+                break;
+            case 'prompt':
+                console.log("Microphone access will prompt the user.");
+                break;
+            case 'denied':
+                console.log("Microphone access is denied.");
+                break;
+            default:
+                console.log("Unknown state for microphone access.");
+        }
+        
+        // 监听权限状态的变化
+        permission.onchange = () => {
+          console.log("Microphone permission state changed to:", permission.state);
+        };
+      } catch (error) {
+      console.error(`An error occurred while checking microphone permission: ${error.message}`);
+      }
+        }
+
+        // 调用函数
+        checkMicrophonePermission();
+
+
         // const recognition = new webkitSpeechRecognition();
         // 创建 SpeechRecognition 对象实例
         var recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
