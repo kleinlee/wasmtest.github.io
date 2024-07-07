@@ -18,12 +18,15 @@
                     });
                     recognition = new window.asr.Recognition(asr);
                     recognition.onresult = function(event) {
+                        document.getElementById('transcript').innerHTML = event.results;
                         console.log('ASR result:', event.results);
                     };
                     recognition.onerror = function(event) {
+                        document.getElementById('transcript').innerHTML = "<b>ASR error<b>";
                         console.error('ASR error:', event.error);
                     };
                 } catch (error) {
+                    document.getElementById('transcript').innerHTML = "<b>Failed to initialize ASR<b>";
                     console.error('Failed to initialize ASR:', error);
                 }
             }
@@ -46,5 +49,6 @@
     <button onclick="initAsr()">初始化ASR</button>
     <button onclick="startRecognition()">开始识别</button>
     <button onclick="stopRecognition()">停止识别</button>
+    <div id="transcript"></div>
 </body>
 </html>
